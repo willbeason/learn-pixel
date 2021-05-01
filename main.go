@@ -5,6 +5,7 @@ import (
 	_ "image/png"
 	"io"
 	"os"
+	"time"
 
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
@@ -42,19 +43,31 @@ func run() {
 	if err != nil {
 		panic(err)
 	}
+	win.SetSmooth(true)
 
-	pic, err := loadPicture("hiking.png")
+	pic, err := loadPicture("sprites/hiking.png")
 	if err != nil {
 		panic(err)
 	}
 
 	sprite := pixel.NewSprite(pic, pic.Bounds())
 
-	win.Clear(colornames.Greenyellow)
+	angle := 0.0
 
-	sprite.Draw(win, pixel.IM.Moved(win.Bounds().Center()))
-
+	last := time.Now()
 	for !win.Closed() {
+		dt := time.Since(last).Seconds()
+		last = time.Now()
+
+		angle += 3 * dt
+
+		win.Clear(colornames.Firebrick)
+
+		mat := pixel.IM
+		mat = mat.Rotated(pixel.ZV, angle)
+		mat = mat.Moved(win.Bounds().Center())
+		sprite.Draw(win, mat)
+
 		win.Update()
 	}
 }
